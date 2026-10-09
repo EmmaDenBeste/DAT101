@@ -224,9 +224,7 @@ function CheckForDupesTower() {
                 newDices[5] = remainingNumbers[1];
             }
             if (newDices[0] == newDices[2] || newDices[2] == newDices[4] || newDices[4] == newDices[2]) {
-                if (newDices[0] != newDices[2] || newDices[2] != newDices[4] || newDices[4] != newDices[2]) {
-                    checkingForDupes = false;
-                }
+                checkingForDupes = false;
             }
             else {
                 RerollDice();
