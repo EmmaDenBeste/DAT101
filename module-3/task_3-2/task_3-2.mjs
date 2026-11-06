@@ -38,7 +38,7 @@ let q = 2;
 let isPrime = true;
 while (q < 200) {
     for (let w = 2; w < q; w++) {
-        if (q % w === 0) {
+        if (q % w == 0) {
             isPrime = false;
         }
     }

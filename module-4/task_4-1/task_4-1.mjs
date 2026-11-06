@@ -14,33 +14,127 @@ const CurrencyTypes = {
   THB: { value: 3.3289, name: "Thai baht", denomination: "฿" }
 };
 
+const accountType = {
+  Normal: "Brukskonto",
+  Saving: "Sparekonto",
+  Credit: "Kredittkonto",
+  Pension: "Pensjonskonto"
+}
+
+class TAccount {
+  #type;
+  #balance;
+  #withdrawCount;
+  #currncyType;
+  constructor(aType) {
+    this.#type = aType;
+    this.#balance = 0.0;
+    this.#withdrawCount = 0;
+    this.#currncyType = CurrencyTypes.NOK;
+  }
+
+  #currencyConvert(aType){
+    return CurrencyTypes.NOK.value/this.#currncyType.value*aType.value;
+  }
+  toString() {
+    return this.#type;
+  }
+  setType(aType) {
+    printOut(`Kontotype endret fra ${this.#type} til ${aType}`);
+    this.#type = aType;
+    this.#withdrawCount = 0;
+  }
+  getBalance() {
+    return this.#balance;
+  }
+  deposit(aAmount, aType = CurrencyTypes.NOK) {
+    const newAmount = aAmount / this.#currencyConvert(aType);
+    this.#balance += newAmount;
+    this.#withdrawCount = 0;
+    const den = this.#currncyType.denomination;
+    const txtbalance = this.#balance.toFixed(2);
+    printOut(`Innskudd av ${aAmount.toFixed(2)} ${aType.name}, ny salde er ${txtbalance}${den}`);
+  }
+  withdraw(aAmount, aType = CurrencyTypes.NOK) {
+    if(aType === undefined){
+      aType = CurrencyTypes.NOK;
+    }
+    let canWithdraw = true;
+    switch (this.#type) {
+      case accountType.Pension:
+        canWithdraw = false;
+        printOut("Du kan ikke ta ut fra Pensjonskonto");
+        break;
+      case accountType.Saving:
+        if (this.#withdrawCount >= 3) {
+          canWithdraw = false;
+          printOut("Du kan ikke ta ut mer en 3 ganger fra en sparekonto");
+        }
+        break;
+    }
+    if (canWithdraw === true) {
+      const newAmount = aAmount / this.#currencyConvert(aType);
+      this.#balance -= newAmount;
+      this.#withdrawCount++;
+      const den = this.#currncyType.denomination;
+      const txtbalance = this.#balance.toFixed(2);
+      printOut(`Uttak av ${aAmount} ${aType.name}, ny saldo er ${txtbalance}${den}`);
+    }
+  }
+  setCurrencyType(aType) {
+    if (aType === this.#currncyType) {
+      return;
+    }
+    printOut(`kontovaluta endret fra ${this.#currncyType.name} til ${aType.name}`);
+    this.#balance *= this.#currencyConvert(aType);
+    this.#currncyType = aType;
+    const txtbalance = this.#balance.toFixed(2);
+    printOut(`Ny saldo er: ${txtbalance}${this.#currncyType.denomination}`);
+  }
+}
 
 printOut("--- Part 1 ----------------------------------------------------------------------------------------------");
-/* Put your code below here!*/
+const accountTypeKeys = Object.keys(accountType);
 
-printOut(newLine);
+printOut(accountTypeKeys.toString());
 
 printOut("--- Part 2 ----------------------------------------------------------------------------------------------");
-/* Put your code below here!*/
+const myAccount = new TAccount(accountType.Normal);
+printOut(`myAccount = ${myAccount.toString()}`);
+myAccount.setType(accountType.Saving);
 
-printOut(newLine);
+printOut("--- Part 3 ----------------------------------------------------------------------------------------------");
+
+myAccount.deposit(100);
+myAccount.withdraw(25);
+printOut(`Min konto har balanse: ${myAccount.getBalance()}`);
 
 printOut("--- Part 4 ----------------------------------------------------------------------------------------------");
-/* Put your code below here!*/
+myAccount.deposit(25);
+myAccount.withdraw(30);
+myAccount.withdraw(30);
+myAccount.withdraw(30);
+myAccount.withdraw(30);
+myAccount.setType(accountType.Pension);
+myAccount.withdraw(30);
+myAccount.setType(accountType.Saving);
+myAccount.withdraw(10);
 
 printOut(newLine);
 
 printOut("--- Part 5 ----------------------------------------------------------------------------------------------");
-/* Put your code below here!*/
+myAccount.deposit(150);
 
 printOut(newLine);
 
 printOut("--- Part 6 ----------------------------------------------------------------------------------------------");
-/* Put your code below here!*/
-
-printOut(newLine);
+myAccount.setCurrencyType(CurrencyTypes.SEK);
+myAccount.setCurrencyType(CurrencyTypes.USD);
+myAccount.setCurrencyType(CurrencyTypes.NOK);
 
 printOut("--- Part 7 ----------------------------------------------------------------------------------------------");
-/* Put your code below here!*/
-
-printOut(newLine);
+myAccount.deposit(12, CurrencyTypes.USD);
+myAccount.withdraw(10, CurrencyTypes.GBP);
+myAccount.setCurrencyType(CurrencyTypes.CAD);
+myAccount.setCurrencyType(CurrencyTypes.INR);
+myAccount.withdraw(150.1585, CurrencyTypes.SEK);
